@@ -11,8 +11,8 @@ interface Button {
 }
 
 export default function App() {
-  const [expression, setExpression] = useState('0');
-  const [result, setResult] = useState('0');
+  const [expression, setExpression] = useState("0");
+  const [result, setResult] = useState("0");
 
   const handleButtonPress = (value: any) => {
     setExpression((prevExpression) => prevExpression + value);
@@ -22,30 +22,30 @@ export default function App() {
     try {
       setResult(eval(expression).toString());
     } catch (error) {
-      setResult('Error');
+      setResult("Error");
     }
   };
 
   const handleClear = () => {
-    setExpression('');
-    setResult('');
+    setExpression("");
+    setResult("");
   };
 
   const numbers = [
-    { text: "1", value: "1" },
-    { text: "2", value: "2" },
-    { text: "3", value: "3" },
-    { text: "4", value: "4" },
-    { text: "5", value: "5" },
-    { text: "6", value: "6" },
-    { text: "7", value: "7" },
-    { text: "8", value: "8" },
     { text: "9", value: "9" },
+    { text: "8", value: "8" },
+    { text: "7", value: "7" },
+    { text: "6", value: "6" },
+    { text: "5", value: "5" },
+    { text: "4", value: "4" },
+    { text: "3", value: "3" },
+    { text: "2", value: "2" },
+    { text: "1", value: "1" },
     { text: "0", value: "0" },
-    { text: "+", value: "+" },
-    { text: "-", value: "-" },
-    { text: "x", value: "*" },
-    { text: "/", value: "/" },
+    // { text: "+", value: "+" },
+    // { text: "-", value: "-" },
+    // { text: "x", value: "*" },
+    // { text: "/", value: "/" },
     // { text: "=", value: "=" },
     // { text: "C", value: "C" },
   ];
@@ -67,56 +67,52 @@ export default function App() {
       </View>
       <View style={styles.purpleStrip}></View>
       <View style={styles.bottomContainer}>
-        <FlatList
-          data={numbers}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.text}
-          numColumns={4}
-          // contentContainerStyle={styles.numberGrid}
-        />
         <View style={styles.horizontalOperatorsContainer}>
-        <TouchableOpacity style={styles.button} onPress={handleEvaluate}>
-          <Text style={styles.buttonText}>=</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={handleClear}>
+            <Text style={styles.buttonText}>C</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button} onPress={handleClear}>
-          <Text style={styles.buttonText}>C</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>+/-</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>%</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.buttonsOperatorsTwo}>
+            <Text style={styles.buttonText}>÷</Text>
+          </TouchableOpacity>
         </View>
-    
-        {/* <View style={styles.buttonContainer}>
-          <View style={styles.horizontalOperatorsContainer}>
-            {horizontalOperators.map((button) => (
-              <TouchableOpacity style={styles.button} key={button.text}>
-                <Text style={styles.buttonText}>{button.text}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
 
-          <View style={styles.lowerButtonsGroup}>
-            <View style={styles.numberGrid}>
-              {numbers.map((button) => (
-                <TouchableOpacity style={styles.button} key={button.text}>
-                  <Text style={styles.buttonText}>{button.text}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-            <FlatList 
-              data={numbers}
-              renderItem={renderItem}
-              keyExtractor={(item) => item.text}
-              numColumns={1}
-              contentContainerStyle={styles.numberGrid}
-            />
-            <View style={styles.verticalOperatorsContainer}>
-              {verticalOperators.map((button) => (
-                <TouchableOpacity style={styles.button} key={button.text}>
-                  <Text style={styles.buttonText}>{button.text}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+        <View style={styles.horizontalOperatorsContainer}>
+          <FlatList
+            data={numbers}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.text}
+            numColumns={3}
+          />
+          <View style={styles.verticalOperatorsContainer}>
+            <TouchableOpacity style={styles.buttonsOperatorsTwo} onPress={() => handleButtonPress('*')}>
+              <Text style={styles.buttonText}>x</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.buttonsOperatorsTwo} onPress={() => handleButtonPress('-')}>
+              <Text style={styles.buttonText}>-</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.buttonsOperatorsTwo} onPress={() => handleButtonPress('+')}>
+              <Text style={styles.buttonText}>+</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.buttonsOperatorsTwo}
+              onPress={handleEvaluate}
+            >
+              <Text style={styles.buttonText}>=</Text>
+            </TouchableOpacity>
           </View>
-        </View> */}
+        </View>
       </View>
     </View>
   );
@@ -125,7 +121,7 @@ export default function App() {
 const { width } = Dimensions.get("window");
 
 const responsiveFontSize = (size: number): number => {
-  const baseWidth = 375; // Base width for your design
+  const baseWidth = 375;
   const scale = width / baseWidth;
   return Math.round(scale * size);
 };
@@ -163,7 +159,6 @@ const styles = StyleSheet.create({
   },
   bottomContainer: {
     flex: 1,
-    width: "100%",
     backgroundColor: "#212A35",
     padding: responsiveFontSize(20),
   },
@@ -180,7 +175,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    // gap: 10
+    // gap: 5
   },
   verticalOperatorsContainer: {
     display: "flex",
@@ -212,6 +207,30 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 12,
     backgroundColor: "#2E3A48",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    margin: 5,
+  },
+  // buttonsOperatorsOne: {
+  //   borderRadius: 10,
+  //   width: responsiveFontSize(75),
+  //   height: responsiveFontSize(75),
+  //   paddingHorizontal: 15,
+  //   paddingVertical: 12,
+  //   backgroundColor: "#3E345A",
+  //   display: "flex",
+  //   alignItems: "center",
+  //   justifyContent: "center",
+  //   margin: 5,
+  // },
+  buttonsOperatorsTwo: {
+    borderRadius: 10,
+    width: responsiveFontSize(75),
+    height: responsiveFontSize(75),
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+    backgroundColor: "#6236F5",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
