@@ -1,9 +1,13 @@
 import { StatusBar } from "expo-status-bar";
-import { useState } from "react";
-import { Dimensions } from "react-native";
+import React, { useState } from "react";
+import { Dimensions, useColorScheme } from "react-native";
 import { FlatList } from "react-native";
 import { TouchableOpacity } from "react-native";
 import { StyleSheet, Text, View } from "react-native";
+import Icon from "react-native-vector-icons/FontAwesome5"; // Replace with your chosen icon set
+import escapeRegExp from "escape-string-regexp";
+import * as Haptics from "expo-haptics";
+import { LinearGradient } from "expo-linear-gradient";
 
 interface Button {
   text: string;
@@ -11,24 +15,90 @@ interface Button {
 }
 
 export default function App() {
+  const colorScheme = useColorScheme();
+
+  // const themeTextStyle =
+  //   colorScheme === "light"
+  //     ? styles.topContainerLightText
+  //     : styles.topContainerDarkText;
+  // const themeContainerStyle =
+  //   colorScheme === "light"
+  //     ? styles.topContainerLight
+  //     : styles.topContainerDark;
+  // const themeNumberButtonStyle =
+  //   colorScheme === "light"
+  //     ? styles.numberButtonsLight
+  //     : styles.topContainerDark;
+  // const buttonsOperatorsTwoTheme =
+  //   colorScheme === "light"
+  //     ? styles.buttonsOperatorsTwoLight
+  //     : styles.topContainerDark;
+  // const themeNumberButtonTextStyle =
+  //   colorScheme === "light" ? styles.buttonTextLight : styles.topContainerDark;
+
   const [expression, setExpression] = useState("0");
   const [result, setResult] = useState("0");
 
   const handleButtonPress = (value: any) => {
-    setExpression((prevExpression) => prevExpression + value);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+    setExpression((prevExpression) =>
+      prevExpression === "0" ? value : prevExpression + value
+    );
   };
 
   const handleEvaluate = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
     try {
-      setResult(eval(expression).toString());
+      let sanitizedExpression = expression;
+
+      verticalButtons.forEach((button) => {
+        if (button.value) {
+          const escapedText = escapeRegExp(button.text);
+          sanitizedExpression = sanitizedExpression.replace(
+            new RegExp(escapedText, "g"),
+            button.value
+          );
+        }
+      });
+
+      horizontalButtons.forEach((button) => {
+        if (button.value) {
+          const escapedText = escapeRegExp(button.text);
+          sanitizedExpression = sanitizedExpression.replace(
+            new RegExp(escapedText, "g"),
+            button.value
+          );
+        }
+      });
+
+      setResult(eval(sanitizedExpression).toString());
     } catch (error) {
       setResult("Error");
+      console.log(error);
     }
   };
 
+  const handleBackSpace = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+    setExpression((prevExpression) => {
+      const newExpression = prevExpression.slice(0, -1);
+      if (newExpression === "") {
+        setResult("0");
+      }
+      return newExpression === "" ? "0" : newExpression;
+    });
+  };
+
+  const handleNegative = () => {};
+
   const handleClear = () => {
-    setExpression("");
-    setResult("");
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+    setExpression("0");
+    setResult("0");
   };
 
   const numbers = [
@@ -42,49 +112,102 @@ export default function App() {
     { text: "2", value: "2" },
     { text: "1", value: "1" },
     { text: "0", value: "0" },
-    // { text: "+", value: "+" },
-    // { text: "-", value: "-" },
-    // { text: "x", value: "*" },
-    // { text: "/", value: "/" },
-    // { text: "=", value: "=" },
-    // { text: "C", value: "C" },
+  ];
+
+  const verticalButtons = [
+    { text: "x", value: "*" },
+    { text: "-", value: "-" },
+    { text: "+", value: "+" },
+  ];
+
+  const horizontalButtons = [
+    { text: "%", value: "%" },
+    { text: "÷", value: "/" },
   ];
 
   const renderItem = ({ item }: { item: Button }): JSX.Element => (
     <TouchableOpacity
-      style={styles.button}
+      style={[styles.button]}
       onPress={() => handleButtonPress(item.value)}
+    >
+      <Text style={[styles.buttonText]}>
+        {item.text}
+      </Text>
+    </TouchableOpacity>
+  );
+
+  const renderVerticalButtons = ({ item }: { item: Button }): JSX.Element => (
+    <TouchableOpacity
+      style={[styles.buttonsOperatorsTwo]}
+      onPress={() => handleButtonPress(item.text)}
     >
       <Text style={styles.buttonText}>{item.text}</Text>
     </TouchableOpacity>
   );
 
+  const renderHorizontalButtons = ({ item }: { item: Button }): JSX.Element => (
+    <TouchableOpacity
+      style={[styles.buttonsOperatorsOne]}
+      onPress={() => handleButtonPress(item.text)}
+    >
+      <Text style={[styles.buttonText]}>
+        {item.text}
+      </Text>
+    </TouchableOpacity>
+  );
+
   return (
     <View style={styles.mainContainer}>
-      <View style={styles.topContainer}>
-        <Text style={styles.expression}>{expression}</Text>
-        <Text style={styles.answer}>{result}</Text>
+      {/* Top Container for calculation side */}
+
+      <View style={[styles.topContainer]}>
+        <Text style={[styles.expression]}>{expression}</Text>
+        <Text style={[styles.answer]}>{result}</Text>
       </View>
-      <View style={styles.purpleStrip}></View>
-      <View style={styles.bottomContainer}>
-        <View style={styles.horizontalOperatorsContainer}>
-          <TouchableOpacity style={styles.buttonsOperatorsOne} onPress={handleClear} >
-            <Text style={styles.buttonText}>C</Text>
-          </TouchableOpacity>
 
-          <TouchableOpacity style={styles.buttonsOperatorsOne}>
-            <Text style={styles.buttonText}>+/-</Text>
-          </TouchableOpacity>
+      {/* Gradient Strip */}
+      <LinearGradient
+        colors={["#A430FF", "#F318AD", "#FF2171"]}
+        start={{ x: 0, y: 0.2 }}
+        style={styles.purpleStrip}
+      />
 
-          <TouchableOpacity style={styles.buttonsOperatorsOne} onPress={() => handleButtonPress('%')}>
-            <Text style={styles.buttonText}>%</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.buttonsOperatorsTwo} onPress={() => handleButtonPress('/')}>
-            <Text style={styles.buttonText}>÷</Text>
+      {/* Bottom Section for all the buttons */}
+      <View style={[styles.bottomContainer]}>
+        {/* Utility bar is what containes the backspace button and others to come later on */}
+        <View style={styles.utilityBar}>
+          <TouchableOpacity onPress={handleBackSpace}>
+            <Icon name="backspace" size={30} color="#937CE6" />
           </TouchableOpacity>
         </View>
 
+        {/* Horizontal operators, are the operators with gray buttons */}
+        <View style={styles.horizontalOperatorsContainer}>
+          <TouchableOpacity
+            style={[styles.buttonsOperatorsOne]}
+            onPress={handleClear}
+          >
+            <Text style={[styles.buttonText]}>
+              C
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.buttonsOperatorsOne]}
+            onPress={handleNegative}
+          >
+            <Text style={[styles.buttonText]}>
+              +/-
+            </Text>
+          </TouchableOpacity>
+          <FlatList
+            data={horizontalButtons}
+            renderItem={renderHorizontalButtons}
+            keyExtractor={(item) => item.text}
+            numColumns={2}
+          />
+        </View>
+
+        {/* This section is for both the number buttons(in black) and the vertical operators(in blue) */}
         <View style={styles.horizontalOperatorsContainer}>
           <FlatList
             data={numbers}
@@ -93,17 +216,12 @@ export default function App() {
             numColumns={3}
           />
           <View style={styles.verticalOperatorsContainer}>
-            <TouchableOpacity style={styles.buttonsOperatorsTwo} onPress={() => handleButtonPress('*')}>
-              <Text style={styles.buttonText}>x</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.buttonsOperatorsTwo} onPress={() => handleButtonPress('-')}>
-              <Text style={styles.buttonText}>-</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.buttonsOperatorsTwo} onPress={() => handleButtonPress('+')}>
-              <Text style={styles.buttonText}>+</Text>
-            </TouchableOpacity>
+            <FlatList
+              data={verticalButtons}
+              renderItem={renderVerticalButtons}
+              keyExtractor={(item) => item.text}
+              numColumns={1}
+            />
 
             <TouchableOpacity
               style={styles.buttonsOperatorsTwo}
@@ -130,10 +248,17 @@ const styles = StyleSheet.create({
   mainContainer: {
     height: "100%",
     width: "100%",
-    backgroundColor: "#171C22",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
+  },
+  utilityBar: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    width: "100%",
+    marginBottom: responsiveFontSize(10),
   },
   topContainer: {
     height: "25%",
@@ -146,6 +271,20 @@ const styles = StyleSheet.create({
     paddingTop: responsiveFontSize(45),
     paddingBottom: responsiveFontSize(40),
     paddingHorizontal: responsiveFontSize(20),
+    backgroundColor: "#171C22",
+
+  },
+  topContainerLight: {
+    backgroundColor: "#F3F2F5",
+  },
+  topContainerLightText: {
+    color: "#828A93",
+  },
+  topContainerDark: {
+    backgroundColor: "#171C22",
+  },
+  topContainerDarkText: {
+    color: "#fff",
   },
   expression: {
     color: "#828A93",
@@ -160,7 +299,8 @@ const styles = StyleSheet.create({
   bottomContainer: {
     flex: 1,
     backgroundColor: "#212A35",
-    padding: responsiveFontSize(20),
+    paddingVertical: responsiveFontSize(15),
+    paddingHorizontal: responsiveFontSize(20),
   },
   buttonContainer: {
     flex: 1,
@@ -212,6 +352,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     margin: 5,
   },
+  numberButtonsLight: {
+    backgroundColor: "#FFFFFF",
+  },
   buttonsOperatorsOne: {
     borderRadius: 10,
     width: responsiveFontSize(75),
@@ -236,10 +379,16 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     margin: 5,
   },
+  buttonsOperatorsTwoLight: {
+    backgroundColor: "#D9D8E0",
+  },
   buttonText: {
     color: "#ffffff",
     fontSize: 32,
     fontWeight: "600",
+  },
+  buttonTextLight: {
+    color: "#19191B",
   },
   purpleStrip: {
     height: 10,
