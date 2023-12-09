@@ -68,19 +68,19 @@ export default function App() {
       <View style={styles.purpleStrip}></View>
       <View style={styles.bottomContainer}>
         <View style={styles.horizontalOperatorsContainer}>
-          <TouchableOpacity style={styles.button} onPress={handleClear}>
+          <TouchableOpacity style={styles.buttonsOperatorsOne} onPress={handleClear} >
             <Text style={styles.buttonText}>C</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity style={styles.buttonsOperatorsOne}>
             <Text style={styles.buttonText}>+/-</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity style={styles.buttonsOperatorsOne} onPress={() => handleButtonPress('%')}>
             <Text style={styles.buttonText}>%</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.buttonsOperatorsTwo}>
+          <TouchableOpacity style={styles.buttonsOperatorsTwo} onPress={() => handleButtonPress('/')}>
             <Text style={styles.buttonText}>÷</Text>
           </TouchableOpacity>
         </View>
@@ -206,24 +206,24 @@ const styles = StyleSheet.create({
     height: responsiveFontSize(75),
     paddingHorizontal: 15,
     paddingVertical: 12,
+    backgroundColor: "#171C22",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    margin: 5,
+  },
+  buttonsOperatorsOne: {
+    borderRadius: 10,
+    width: responsiveFontSize(75),
+    height: responsiveFontSize(75),
+    paddingHorizontal: 15,
+    paddingVertical: 12,
     backgroundColor: "#2E3A48",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     margin: 5,
   },
-  // buttonsOperatorsOne: {
-  //   borderRadius: 10,
-  //   width: responsiveFontSize(75),
-  //   height: responsiveFontSize(75),
-  //   paddingHorizontal: 15,
-  //   paddingVertical: 12,
-  //   backgroundColor: "#3E345A",
-  //   display: "flex",
-  //   alignItems: "center",
-  //   justifyContent: "center",
-  //   margin: 5,
-  // },
   buttonsOperatorsTwo: {
     borderRadius: 10,
     width: responsiveFontSize(75),
